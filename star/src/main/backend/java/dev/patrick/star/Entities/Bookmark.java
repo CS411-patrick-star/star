@@ -23,4 +23,9 @@ public class Bookmark {
     private String date;
     @DocumentReference
     private List<BookmarkElement> bookmarkElements;
+
+    public Bookmark(Website website, String date){
+        this.websiteId = website;
+        this.date = date;
+    }
 }

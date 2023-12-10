@@ -14,7 +14,6 @@ public class BookmarkService {
     @Autowired
     private BookmarkRepository bookmarkRepository;
     public List<Bookmark> allBookmarks(){
-        System.out.println(bookmarkRepository.findAll().toString());
         return bookmarkRepository.findAll();
     }
 

@@ -1,5 +1,3 @@
-
-// Routes.js
 import React from 'react';
 import { Route, Routes } from "react-router-dom";
 import BookmarksPage from './Pages/BookmarksPage';

@@ -6,11 +6,38 @@ import '../Styles/index.css';
 
 const MainPage = () => {
 
-    const handleAddBookmark = () => {
-    
-        console.log('Bookmark added!');
-    };
-
+    const handleAddBookmark = async () => {
+        const websiteId = "your-website-id";
+        const bookmarkName = "your-bookmark-name";
+        const bookmarkDescription = "your-bookmark-description";
+        const dateAdded = "your-date-added";
+        const addition = "your-addition";
+        const baseUrl = "your-base-url";
+      
+        const formData = new FormData();
+        formData.append("websiteId", websiteId);
+        formData.append("bookmarkName", bookmarkName);
+        formData.append("bookmarkDescription", bookmarkDescription);
+        formData.append("dateAdded", dateAdded);
+        formData.append("addition", addition);
+        formData.append("baseUrl", baseUrl);
+      
+        try {
+          const response = await fetch("http://localhost:8080/api/v1/bookmarks/newBookmark", {
+            method: "POST",
+            body: formData,
+          });
+      
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+      
+          const responseData = await response.json();
+          console.log("Bookmark created successfully:", responseData);
+        } catch (error) {
+          console.error("Error creating bookmark:", error.message);
+        }
+      };
 
     return (
         <div className="page">

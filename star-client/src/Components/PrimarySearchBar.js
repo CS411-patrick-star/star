@@ -1,4 +1,5 @@
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import HomeIcon from '@mui/icons-material/Home';
 import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
@@ -12,9 +13,9 @@ import InputBase from '@mui/material/InputBase';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import TabComponent from './Tabs';
 
 const Search = styled('div')(({ theme }) => ({
@@ -60,7 +61,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 export default function PrimarySearchAppBar() {
-    const [anchorEl, setAnchorEl] = React.useState(null);
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
@@ -82,6 +84,10 @@ export default function PrimarySearchAppBar() {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+  const goToMainPage = () => {
+    navigate('/');
+}
 
   const CustomComponentAboveSearchBar = () => {
     return (
@@ -177,13 +183,17 @@ export default function PrimarySearchAppBar() {
               sx={{ mr: 2 }} >
               <MenuIcon />
             </IconButton>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: 'none', sm: 'block' } }}  >
-            STAR
-            </Typography>
+            
+             <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              sx={{ ml: 2 }}
+              onClick={goToMainPage} >
+              <HomeIcon />
+            </IconButton>
+        
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />

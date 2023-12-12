@@ -35,6 +35,11 @@ public class BookmarkController {
         return new ResponseEntity<List<Bookmark>>(bookmarkService.getBookmarksFromBookmarkFolder(bookmarkFolderId), HttpStatus.OK);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Bookmark>> getBookmarkByUserId(@PathVariable String userId){
+        return new ResponseEntity<List<Bookmark>>(bookmarkService.getBookmarkByUserId(userId), HttpStatus.OK);
+    }
+
     @PostMapping("/newBookmark")
     public ResponseEntity<AddNewBookmarkResponse> createBookmark(@RequestPart String websiteId
             ,@RequestPart String bookmarkName ,@RequestPart String bookmarkDescription, @RequestPart String dateAdded, @RequestPart String addition, @RequestPart String baseUrl){

@@ -1,10 +1,8 @@
 package dev.patrick.star.Services;
 
-import dev.patrick.star.Entities.Bookmark;
-import dev.patrick.star.Entities.BookmarkElement;
-import dev.patrick.star.Entities.BookmarkFolder;
-import dev.patrick.star.Entities.Website;
+import dev.patrick.star.Entities.*;
 import dev.patrick.star.Repositories.BookmarkRepository;
+import dev.patrick.star.Repositories.UserRepository;
 import dev.patrick.star.Repositories.WebsiteRepository;
 import dev.patrick.star.Requests.AddNewBookmarkRequest;
 import dev.patrick.star.Responses.AddNewBookmarkResponse;
@@ -15,7 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Book;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +22,9 @@ public class BookmarkService {
 
     @Autowired
     private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private WebsiteRepository websiteRepository;
@@ -103,8 +104,26 @@ public class BookmarkService {
             return 1;
         }
         catch (Exception e){
-            System.out.println(e.toString());
+            System.out.println(e.getMessage());
             return 0;
+        }
+    }
+
+    public List<Bookmark> getBookmarkByUserId(String userId){
+
+        ObjectId userObjectId = new ObjectId(userId);
+        User user;
+        List<Bookmark> returnList = new ArrayList<>();
+        if(userRepository.findById(userObjectId).isPresent()){
+
+            user = userRepository.findById(userObjectId).get();
+            for(int i = 0; i < user.getBookmarkFolders().size(); i++){
+
+                returnList.addAll(user.getBookmarkFolders().get(i).getBookmarks());
+            }
+            return returnList;
+        } else {
+            return null;
         }
     }
 

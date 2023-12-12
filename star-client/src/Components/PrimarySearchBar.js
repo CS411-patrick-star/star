@@ -1,29 +1,35 @@
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import HomeIcon from '@mui/icons-material/Home';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import SearchIcon from '@mui/icons-material/Search';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AppBar from '@mui/material/AppBar';
-import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import { styled } from '@mui/material/styles';
-import * as React from 'react';
+import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabComponent from './Tabs';
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: '100px',
-  backgroundColor: '#F1B4BB',
+  backgroundColor: '#FFF5E0 ',
   '&:hover': {
-    backgroundColor: '#FF8F8F',
+    backgroundColor: '#FFBF96',
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -50,10 +56,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
       padding: theme.spacing(1, 1, 1, 0),
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
       transition: theme.transitions.create('width'),
-      width: '300px', // Increase the width as needed
-      borderRadius: '50px !important', // Adjust the border-radius as needed
+      width: '300px',
+      borderRadius: '50px !important',
       [theme.breakpoints.up('md')]: {
-        width: '100vh', // Adjust the width for larger screens if needed
+        width: '100vh',
       },
     },
   }));
@@ -64,6 +70,16 @@ export default function PrimarySearchAppBar() {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [loginDialogOpen, setLoginDialogOpen] = React.useState(false);
+
+
+  const handleCloseLoginDialog = () => {
+    setLoginDialogOpen(false);
+  };
+
+  const handleOpenLoginDialog = () => {
+    setLoginDialogOpen(true);
+  };
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -85,18 +101,70 @@ export default function PrimarySearchAppBar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('/api/login', {
+        email,
+        password,
+      });
+  
+      // Check if the request was successful (status code 2xx)
+      if (response.status >= 200 && response.status < 300) {
+        // Authentication successful, close the dialog or redirect
+        handleCloseLoginDialog();
+      } else {
+        // Authentication failed, handle the error (show an error message, etc.)
+        console.error('Authentication failed');
+      }
+    } catch (error) {
+      // Handle network errors, or errors thrown by Axios
+      console.error('Error during authentication:', error);
+    }
+  };
+  
+
+   const loginDialogContent = (
+    <Dialog open={loginDialogOpen} onClose={handleCloseLoginDialog}>
+      <DialogTitle>Login</DialogTitle>
+      <DialogContent>
+        <TextField label="Email" fullWidth margin="normal" />
+        <TextField label="Password" type="password" fullWidth margin="normal" />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseLoginDialog}>Cancel</Button>
+        <Button onClick={handleLogin} color="primary">
+          Login
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
   const goToMainPage = () => {
     navigate('/');
 }
-
+  const addPageToBookmarks = () => {
+    ///////////////////////////
+    console.log("added page");
+  }
   const CustomComponentAboveSearchBar = () => {
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 'auto' }}>
+      <Box sx={{ width:'100%', display: 'flex', alignItems: 'center', marginRight: 'auto' }}>
         <TabComponent />
       </Box>
     );
   };
-  const menuId = 'primary-search-account-menu';
+
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -104,7 +172,6 @@ export default function PrimarySearchAppBar() {
         vertical: 'top',
         horizontal: 'right',
       }}
-      id={menuId}
       keepMounted
       transformOrigin={{
         vertical: 'top',
@@ -113,12 +180,10 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleOpenLoginDialog}>Login</MenuItem>
     </Menu>
   );
 
-  const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
@@ -126,7 +191,6 @@ export default function PrimarySearchAppBar() {
         vertical: 'top',
         horizontal: 'right',
       }}
-      id={mobileMenuId}
       keepMounted
       transformOrigin={{
         vertical: 'top',
@@ -135,25 +199,6 @@ export default function PrimarySearchAppBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit" >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
@@ -173,7 +218,7 @@ export default function PrimarySearchAppBar() {
       <CustomComponentAboveSearchBar/>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static"
-          sx={{ backgroundColor: '#FFC5C5', height: '100px' }} >
+          sx={{ backgroundColor: '#FFCF96', height: '100px' }} >
           <Toolbar>
             <IconButton
               size="large"
@@ -202,24 +247,14 @@ export default function PrimarySearchAppBar() {
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }} />
             </Search>
+            <IconButton onClick={addPageToBookmarks}>
+              <StarBorderIcon/>
+            </IconButton>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <IconButton size="large" aria-label="show 4 new mails" color="inherit"> 
-              </IconButton>
-              <IconButton
-                size="large"
-                aria-label="show 17 new notifications"
-                color="inherit" >
-                <Badge>
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
               <IconButton
                 size="large"
                 edge="end"
-                aria-label="account of current user"
-                aria-controls={menuId}
-                aria-haspopup="true"
                 onClick={handleProfileMenuOpen}
                 color="inherit"  >
                 <AccountCircle />
@@ -228,9 +263,6 @@ export default function PrimarySearchAppBar() {
             <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
               <IconButton
                 size="large"
-                aria-label="show more"
-                aria-controls={mobileMenuId}
-                aria-haspopup="true"
                 onClick={handleMobileMenuOpen}
                 color="inherit" >
                 <MoreIcon />
@@ -240,6 +272,7 @@ export default function PrimarySearchAppBar() {
         </AppBar>
         {renderMobileMenu}
         {renderMenu}
+        {loginDialogOpen && loginDialogContent}
       </Box>
     </div>
   );

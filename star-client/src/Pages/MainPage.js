@@ -1,6 +1,7 @@
 import React from 'react';
 import BookmarkOptions from '../Components/BookmarkOptions';
 import PrimarySearchAppBar from '../Components/PrimarySearchBar';
+import '../Styles/index.css';
 
 const MainPage = () => {
   const handleAddBookmark = () => {

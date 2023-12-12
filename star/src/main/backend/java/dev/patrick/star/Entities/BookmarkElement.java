@@ -19,4 +19,11 @@ public class BookmarkElement {
     private String bookmarkDescription;
     private String dateAdded;
     private String addition;
+
+    public BookmarkElement(String bookmarkName, String bookmarkDescription, String dateAdded, String addition){
+        this.bookmarkName = bookmarkName;
+        this.bookmarkDescription = bookmarkDescription;
+        this.dateAdded = dateAdded;
+        this.addition = addition;
+    }
 }

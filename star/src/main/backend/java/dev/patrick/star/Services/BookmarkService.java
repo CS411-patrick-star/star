@@ -1,9 +1,13 @@
 package dev.patrick.star.Services;
 
 import dev.patrick.star.Entities.Bookmark;
+import dev.patrick.star.Entities.BookmarkElement;
 import dev.patrick.star.Entities.BookmarkFolder;
 import dev.patrick.star.Entities.Website;
 import dev.patrick.star.Repositories.BookmarkRepository;
+import dev.patrick.star.Repositories.WebsiteRepository;
+import dev.patrick.star.Requests.AddNewBookmarkRequest;
+import dev.patrick.star.Responses.AddNewBookmarkResponse;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -11,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Book;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +24,9 @@ public class BookmarkService {
 
     @Autowired
     private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private WebsiteRepository websiteRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -35,9 +43,52 @@ public class BookmarkService {
         bookmarkRepository.deleteAll();
     }
 
-    public Bookmark createBookmark(Website website, String date){
-        Bookmark bookmark = bookmarkRepository.insert(new Bookmark(website, date));
-        return bookmark;
+    public AddNewBookmarkResponse createBookmark(AddNewBookmarkRequest addNewBookmarkRequest){
+
+        System.out.println("Im in the service");
+        BookmarkElement bookmarkElement = new BookmarkElement(addNewBookmarkRequest.getBookmarkName(), addNewBookmarkRequest.getBookmarkDescription(), addNewBookmarkRequest.getDateAdded(), addNewBookmarkRequest.getAddition());
+        mongoTemplate.update(BookmarkElement.class)
+                .matching(Criteria.where("id").is(bookmarkElement.getId()))
+                .apply(new Update().push("bookmarkElements").value(bookmarkElement))
+                .first();
+        System.out.println("Im in the service1");
+        Bookmark bookmark;
+        if(bookmarkRepository.findBookmarkByWebsiteId(addNewBookmarkRequest.getWebsiteId()).isPresent()){
+
+            bookmark = bookmarkRepository.findBookmarkByWebsiteId(addNewBookmarkRequest.getWebsiteId()).get();
+        } else {
+            bookmark = null;
+        }
+        System.out.println("Im in the service2");
+
+        if(bookmark == null){
+
+            System.out.println("Im in the service3");
+            Website website;
+            if(!websiteRepository.findWebsiteByWebsiteLink(addNewBookmarkRequest.getBaseUrl()).isPresent()){
+                website = new Website(addNewBookmarkRequest.getBaseUrl());
+                mongoTemplate.update(Website.class)
+                        .matching(Criteria.where("id").is(website.getId()))
+                        .apply(new Update().push("websites").value(website))
+                        .first();
+            } else {
+                website = websiteRepository.findWebsiteByWebsiteLink(addNewBookmarkRequest.getBaseUrl()).get();
+            }
+            Bookmark newBookmark = new Bookmark(website, addNewBookmarkRequest.getDateAdded());
+            System.out.println("Im in the service4");
+            newBookmark.getBookmarkElements().add(bookmarkElement);
+            mongoTemplate.update(Bookmark.class)
+                    .matching(Criteria.where("id").is(newBookmark.getId()))
+                    .apply(new Update().push("bookmarks").value(newBookmark))
+                    .first();
+        } else {
+            bookmark.getBookmarkElements().add(bookmarkElement);
+            mongoTemplate.update(Bookmark.class)
+                    .matching(Criteria.where("id").is(bookmark.getId()))
+                    .apply(new Update().push("bookmarks").value(bookmark))
+                    .first();
+        }
+        return null;
     }
 
     public int addBookmarkToBookmarkFolder(ObjectId bookmarkId, ObjectId bookmarkFolderId){
@@ -55,5 +106,10 @@ public class BookmarkService {
             System.out.println(e.toString());
             return 0;
         }
+    }
+
+    public List<Bookmark> getBookmarksFromBookmarkFolder(ObjectId bookmarkFolderId){
+        BookmarkFolder bookmarkFolder = mongoTemplate.findById(bookmarkFolderId, BookmarkFolder.class);
+        return bookmarkFolder.getBookmarks();
     }
 }

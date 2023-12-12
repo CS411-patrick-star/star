@@ -16,4 +16,8 @@ public class Website {
     @Id
     private ObjectId id;
     private String websiteLink;
+
+    public Website(String websiteLink){
+        this.websiteLink = websiteLink;
+    }
 }

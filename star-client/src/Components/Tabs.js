@@ -53,15 +53,9 @@ export default function BasicTabs() {
   };
 
   const closeTab = (index) => {
-    // Check if the closing tab is the currently selected one
     const isSelectedTab = value === index;
-  
-    // Filter out the closing tab
     const updatedTabs = tabs.filter((tab) => tab.index !== index);
-  
-    // Update the value only if the closing tab is selected
     if (isSelectedTab) {
-      // If there are remaining tabs, set the value to the first one; otherwise, set to 0
       setValue(updatedTabs.length > 0 ? updatedTabs[0].index : 0);
     }
   

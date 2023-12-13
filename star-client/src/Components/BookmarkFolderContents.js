@@ -65,8 +65,8 @@ export default function BookmarkFolderContents({ folderId, handleClose }) {
   };
 
   React.useEffect(() => {
-    handleClickOpen(); // Automatically open the dialog when the component mounts
-  }, []); // Empty dependency array means it only runs once, like componentDidMount
+    handleClickOpen();
+  }, []);
 
   return (
     <React.Fragment>

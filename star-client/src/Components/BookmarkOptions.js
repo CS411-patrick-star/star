@@ -59,8 +59,8 @@ export default function BookmarkOptions() {
     if (path === '/add-bookmark') {
 
        setShowAddBookmarkForm(true);
-      // setShowDeleteBookmarkForm(false);
-      // setShowEditBookmarkForm(false);
+       setShowDeleteBookmarkForm(false);
+       setShowEditBookmarkForm(false);
     }
     else if (path === '/delete-bookmarks') {
       setShowDeleteBookmarkForm(true);

@@ -7,6 +7,45 @@ import PrimarySearchAppBar from '../Components/PrimarySearchBar';
 import '../Styles/index.css';
 import patrick from '../patrick.png';
 
+const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: '100px',
+    backgroundColor: '#FFBF96 ',
+    '&:hover': {
+        backgroundColor: '#FFFFFF',
+    },
+    marginTop: theme.spacing(2),
+    [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(3),
+        width: 'auto',
+    },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'red',
+    '& .MuiInputBase-input': {
+        padding: theme.spacing(1, 1, 1, 0),
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        transition: theme.transitions.create('width'),
+        width: '300px',
+        borderRadius: '50px !important',
+        [theme.breakpoints.up('md')]: {
+            width: '100vh',
+        },
+    },
+}));
+
+
 const MainPage = () => {
     return (
         <div className="page">
@@ -41,41 +80,3 @@ const MainPage = () => {
 };
 
 export default MainPage;
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: '100px',
-    backgroundColor: '#FFBF96 ',
-    '&:hover': {
-        backgroundColor: '#FFFFFF',
-    },
-    marginTop: theme.spacing(2), // Adjust margin if needed
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-    },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'red',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '300px',
-        borderRadius: '50px !important',
-        [theme.breakpoints.up('md')]: {
-            width: '100vh',
-        },
-    },
-}));

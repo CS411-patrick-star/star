@@ -5,6 +5,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
@@ -33,13 +37,30 @@ export default function BookmarkOptions() {
   const [websiteUrl, setWebsiteUrl] = React.useState('');
   const [bookmark, setSelectedBookmark] = React.useState(null);
 
+  const handleCloseAdd = () => {
+    setShowAddBookmarkForm(false);
+  };
+  
+  const handleCloseEdit = () => {
+    setShowEditBookmarkForm(false);
+  };
+  
+  const handleOpenAdd = () => {
+    setShowAddBookmarkForm(true);
+  };
+
+  const handleOpenEdit = () => {
+    setShowEditBookmarkForm(true);
+  };
+
+
 
   const handleClick = (path) => {
     if (path === '/add-bookmark') {
-    
-      setShowAddBookmarkForm(true);
-      setShowDeleteBookmarkForm(false);
-      setShowEditBookmarkForm(false);
+
+       setShowAddBookmarkForm(true);
+      // setShowDeleteBookmarkForm(false);
+      // setShowEditBookmarkForm(false);
     }
     else if (path === '/delete-bookmarks') {
       setShowDeleteBookmarkForm(true);
@@ -71,8 +92,6 @@ export default function BookmarkOptions() {
     formData.append("addition", "your-addition");
     formData.append("baseUrl", websiteUrl);
 
-
-
     try {
       const response = await fetch("http://localhost:8080/api/v1/bookmarks/newBookmark", {
         method: "POST",
@@ -92,11 +111,42 @@ export default function BookmarkOptions() {
     }
   };
 
+    const addContent = (
+      <Dialog open={showAddBookmarkForm} onClose={handleCloseAdd}>
+      <DialogTitle> Add a bookmark </DialogTitle>
+      <DialogContent>
+        <TextField label="Bookmark Name" fullWidth margin="normal" onChange={(e) => setBookmarkName(e.target.value)} />
+        <TextField label="Bookmark Description" fullWidth margin="normal" onChange={(e) => setBookmarkDescription(e.target.value)} />
+        <TextField label="Website URL" fullWidth margin="normal" onChange={(e) => setWebsiteUrl(e.target.value)} />
+      </DialogContent>
+    <DialogActions>
+      <Button variant="contained"  sx={{ backgroundColor: '#ff5722' }} onClick={handleAddBookmark}>
+          Add Bookmark
+      </Button>
+    </DialogActions>
+  </Dialog>
+    );
+    const editContent = (
+      <Dialog open={showEditBookmarkForm} onClose={handleCloseEdit}>
+      <DialogTitle> Edit a bookmark </DialogTitle>
+      <DialogContent>
+        <TextField label="New Bookmark Name" fullWidth margin="normal" onChange={(e) => setBookmarkName(e.target.value)} />
+        <TextField label="New Bookmark Description" fullWidth margin="normal" onChange={(e) => setBookmarkDescription(e.target.value)} />
+        <TextField label="New Website URL" fullWidth margin="normal" onChange={(e) => setWebsiteUrl(e.target.value)} />
+      </DialogContent>
+    <DialogActions>
+      <Button variant="contained"  sx={{ backgroundColor: '#ff5722' }} onClick={handleEditBookmark}>
+          Change Bookmark
+      </Button>
+    </DialogActions>
+  </Dialog>
+    );
+  
     return (
-      <Box sx={{ height: 320, transform: 'translateZ(0px)', flexGrow: 1 }}>
+      <Box sx={{ position: 'relative', flexGrow: 1 }}>
         <SpeedDial
           ariaLabel="SpeedDial openIcon example"
-          sx={{ position: 'absolute', bottom: 16, right: 16 }}
+          sx={{ position: 'absolute', bottom: 16}}
           icon={<SpeedDialIcon icon={<StarBorderIcon />} openIcon={<EditIcon />} />}
         >
           {actions.map((action) => (
@@ -109,31 +159,9 @@ export default function BookmarkOptions() {
           ))}
         </SpeedDial>
   
-        {showAddBookmarkForm && (
-          <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <form>
-              <TextField label="Bookmark Name" fullWidth margin="normal" onChange={(e) => setBookmarkName(e.target.value)} />
-              <TextField label="Bookmark Description" fullWidth margin="normal" onChange={(e) => setBookmarkDescription(e.target.value)} />
-              <TextField label="Website URL" fullWidth margin="normal" onChange={(e) => setWebsiteUrl(e.target.value)} />
-              <Button variant="contained" color="primary" onClick={handleAddBookmark}>
-                Add Bookmark
-              </Button>
-            </form>
-          </Box>
-        )}
+        {showAddBookmarkForm && addContent}
 
-        {showEditBookmarkForm && (
-                  <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                    <form>
-                      <TextField label="New Bookmark Name" fullWidth margin="normal" />
-                      <TextField label="New Bookmark Description" fullWidth margin="normal" />
-                      <TextField label="New Website URL" fullWidth margin="normal" />
-                      <Button variant="contained" color="primary" onClick={handleEditBookmark}>
-                        Confirm
-                      </Button>
-                    </form>
-                  </Box>
-                )}
+        {showEditBookmarkForm && editContent}
         </Box>
     );
   }

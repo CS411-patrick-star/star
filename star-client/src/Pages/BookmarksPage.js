@@ -65,7 +65,12 @@ const BookmarksPage = () => {
     <div className="page">
       <div className="b"></div>
       <PrimarySearchAppBar />
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+  <label style={{ fontSize: '24px', fontWeight: 'bold' }}>My Bookmarks</label>
+</div>
+
       <Grid container justifyContent="center" alignItems="center" style={{ height: '70vh' }}>
+     
 {/*
         {folders.map((folder) => (
           <Fab
@@ -86,9 +91,10 @@ const BookmarksPage = () => {
         <BookmarkFolderContents folderId={selectedFolder} handleClose={closeDialog} />
       ) : (
         <div className="displaybookmarks" style={{ display: 'flex', flexWrap: 'wrap' }}>
+         
           {allBookmarks.map((bookmark) => (
             <div key={bookmark.id} style={{ margin: '10px' }}>
-              {/* Use IconButton to open dialog for each bookmark */}
+          
               <IconButton
                 onClick={() => openBookmarkDialog(bookmark)}
                 color="primary"
@@ -96,8 +102,6 @@ const BookmarksPage = () => {
                 style={{
                   width: '100px',
                   height: '100px',
-                
-               
                 }}
               >
                 <StarIcon fontSize="large" />
@@ -108,16 +112,16 @@ const BookmarksPage = () => {
         </div>
       )}
 
-      {/* Display bookmark details in a dialog */}
       <BootstrapDialog onClose={closeDialog} open={selectedBookmark !== null}>
         <DialogTitle>Bookmark Details</DialogTitle>
         <DialogContent>
           {selectedBookmark && (
             <>
-              <p><strong>Sender:</strong> {selectedBookmark.sender}</p>
-              <p><strong>Title:</strong> {selectedBookmark.title}</p>
-              <p><strong>Content:</strong> {selectedBookmark.content}</p>
+              <p><strong>Title:</strong> {selectedBookmark.bookmarkName}</p>
+              <p><strong>Content:</strong> {selectedBookmark.bookmarkDescription}</p>
               <p><strong>Date:</strong> {selectedBookmark.date}</p>
+              <p><strong>Website:</strong> {selectedBookmark.websiteId}</p>
+
             </>
           )}
         </DialogContent>

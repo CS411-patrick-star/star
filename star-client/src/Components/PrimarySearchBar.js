@@ -1,5 +1,6 @@
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
@@ -53,7 +54,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'red',
+    color: 'black',
     '& .MuiInputBase-input': {
       padding: theme.spacing(1, 1, 1, 0),
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
@@ -73,6 +74,12 @@ export default function PrimarySearchAppBar() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [loginDialogOpen, setLoginDialogOpen] = React.useState(false);
+  const [websiteDialogOpen, setWebsiteDialogOpen] = React.useState(false);
+  const [bookmarkName, setBookmarkName] = React.useState('');
+  
+  const [bookmarkDescription, setBookmarkDescription] = React.useState('');
+  const [websiteUrl, setWebsiteUrl] = React.useState('');
+
 
 
   const handleCloseLoginDialog = () => {
@@ -82,6 +89,16 @@ export default function PrimarySearchAppBar() {
   const handleOpenLoginDialog = () => {
     setLoginDialogOpen(true);
   };
+
+  const handleOpenWebsiteDialog = () => {
+    console.log("entered openwebsitedialog");
+    setWebsiteDialogOpen(true);
+  };
+
+  const handleCloseWebsiteDialog = () => {
+    setWebsiteDialogOpen(false);
+  };
+
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -98,7 +115,34 @@ export default function PrimarySearchAppBar() {
     setAnchorEl(null);
     handleMobileMenuClose();
   };
+  
+  const addPageToBookmarks = async () => {
+    const formData = new FormData();
+    formData.append("websiteId", "your-website-id");
+    formData.append("bookmarkName", bookmarkName);
+    formData.append("bookmarkDescription", bookmarkDescription);
+    formData.append("dateAdded", "your-date-added");
+    formData.append("addition", "your-addition");
+    formData.append("baseUrl", websiteUrl);
 
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/bookmarks/newBookmark", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log("Bookmark created successfully:", responseData);
+
+    } catch (error) {
+      console.error("Error creating bookmark:", error.message);
+    }
+  };
+  
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
@@ -152,9 +196,31 @@ export default function PrimarySearchAppBar() {
     </Dialog>
   );
 
+  const websiteDialog = (
+    <Dialog open={websiteDialogOpen} onClose={handleCloseWebsiteDialog}>
+      <DialogTitle>Add Website to Bookmarks</DialogTitle>
+      <DialogContent>
+        <TextField label="Bookmark Name" fullWidth margin="normal" onChange={(e) => setBookmarkName(e.target.value)} />
+        <TextField label="Bookmark Description" fullWidth margin="normal" onChange={(e) => setBookmarkDescription(e.target.value)} />
+        <TextField label="Website URL: " fullWidth margin="normal" value={websiteUrl}readOnly/>
+
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseWebsiteDialog}>Cancel</Button>
+        <Button onClick={addPageToBookmarks} color="secondary">
+          Add Bookmark
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  const [loading, setLoading] = useState(false);
+
+
   const refresh = () => {
+    setLoading(true);
     window.location.reload();
-  }
+  };
   const goBack = () => {
     window.history.go(-1);
   };
@@ -164,11 +230,8 @@ export default function PrimarySearchAppBar() {
 
   const goToMainPage = () => {
     navigate('/');
-  }
-  const addPageToBookmarks = () => {
-    ///////////////////////////
-    console.log("added page");
-  }
+  };
+
   const CustomComponentAboveSearchBar = () => {
     return (
       <Box sx={{ width:'100%', display: 'flex', alignItems: 'center', marginRight: 'auto' }}>
@@ -195,7 +258,7 @@ export default function PrimarySearchAppBar() {
       <MenuItem onClick={handleOpenLoginDialog}>Login</MenuItem>
     </Menu>
   );
-
+  
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
@@ -257,8 +320,9 @@ export default function PrimarySearchAppBar() {
               aria-label="open drawer"
               onClick={refresh}
               sx={{ mr: 2 }} >
-              <RotateLeftIcon />
+              {loading ? ( <CloseIcon /> ) : (<RotateLeftIcon />  )}
             </IconButton>
+
              <IconButton
               size="large"
               edge="start"
@@ -268,18 +332,21 @@ export default function PrimarySearchAppBar() {
               onClick={goToMainPage} >
               <HomeIcon />
             </IconButton>
-        
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
                 placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }} />
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+              />
+              <IconButton onClick={(e) => { e.preventDefault(); handleOpenWebsiteDialog(); }}>
+                <StarBorderIcon />
+              </IconButton>
             </Search>
-            <IconButton onClick={addPageToBookmarks}>
-              <StarBorderIcon/>
-            </IconButton>
+            {websiteDialogOpen && websiteDialog}
+            
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
               <IconButton

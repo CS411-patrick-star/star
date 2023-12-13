@@ -43,7 +43,6 @@ public class BookmarkController {
     @PostMapping("/newBookmark")
     public ResponseEntity<AddNewBookmarkResponse> createBookmark(@RequestPart String websiteId
             ,@RequestPart String bookmarkName ,@RequestPart String bookmarkDescription, @RequestPart String dateAdded, @RequestPart String addition, @RequestPart String baseUrl){
-        System.out.println("Im in the controller");
         return new ResponseEntity<AddNewBookmarkResponse>(bookmarkService.createBookmark(new AddNewBookmarkRequest(websiteId, bookmarkName, bookmarkDescription, dateAdded, addition, baseUrl)), HttpStatus.OK);
     }
 }

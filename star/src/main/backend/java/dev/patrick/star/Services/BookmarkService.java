@@ -46,50 +46,58 @@ public class BookmarkService {
 
     public AddNewBookmarkResponse createBookmark(AddNewBookmarkRequest addNewBookmarkRequest){
 
-        System.out.println("Im in the service");
-        BookmarkElement bookmarkElement = new BookmarkElement(addNewBookmarkRequest.getBookmarkName(), addNewBookmarkRequest.getBookmarkDescription(), addNewBookmarkRequest.getDateAdded(), addNewBookmarkRequest.getAddition());
-        mongoTemplate.update(BookmarkElement.class)
-                .matching(Criteria.where("id").is(bookmarkElement.getId()))
-                .apply(new Update().push("bookmarkElements").value(bookmarkElement))
-                .first();
-        System.out.println("Im in the service1");
-        Bookmark bookmark;
-        if(bookmarkRepository.findBookmarkByWebsiteId(addNewBookmarkRequest.getWebsiteId()).isPresent()){
+        AddNewBookmarkResponse addNewBookmarkResponse = new AddNewBookmarkResponse();
+        addNewBookmarkResponse.setStatus(0);
 
-            bookmark = bookmarkRepository.findBookmarkByWebsiteId(addNewBookmarkRequest.getWebsiteId()).get();
-        } else {
-            bookmark = null;
-        }
-        System.out.println("Im in the service2");
+        try{
+            BookmarkElement bookmarkElement = new BookmarkElement(addNewBookmarkRequest.getBookmarkName(), addNewBookmarkRequest.getBookmarkDescription(), addNewBookmarkRequest.getDateAdded(), addNewBookmarkRequest.getAddition());
+            mongoTemplate.update(BookmarkElement.class)
+                    .matching(Criteria.where("id").is(bookmarkElement.getId()))
+                    .apply(new Update().push("bookmarkElements").value(bookmarkElement))
+                    .first();
+            Bookmark bookmark;
+            if(bookmarkRepository.findBookmarkByWebsiteId(addNewBookmarkRequest.getWebsiteId()).isPresent()){
 
-        if(bookmark == null){
-
-            System.out.println("Im in the service3");
-            Website website;
-            if(!websiteRepository.findWebsiteByWebsiteLink(addNewBookmarkRequest.getBaseUrl()).isPresent()){
-                website = new Website(addNewBookmarkRequest.getBaseUrl());
-                mongoTemplate.update(Website.class)
-                        .matching(Criteria.where("id").is(website.getId()))
-                        .apply(new Update().push("websites").value(website))
-                        .first();
+                bookmark = bookmarkRepository.findBookmarkByWebsiteId(addNewBookmarkRequest.getWebsiteId()).get();
             } else {
-                website = websiteRepository.findWebsiteByWebsiteLink(addNewBookmarkRequest.getBaseUrl()).get();
+                bookmark = null;
             }
-            Bookmark newBookmark = new Bookmark(website, addNewBookmarkRequest.getDateAdded());
-            System.out.println("Im in the service4");
-            newBookmark.getBookmarkElements().add(bookmarkElement);
-            mongoTemplate.update(Bookmark.class)
-                    .matching(Criteria.where("id").is(newBookmark.getId()))
-                    .apply(new Update().push("bookmarks").value(newBookmark))
-                    .first();
-        } else {
-            bookmark.getBookmarkElements().add(bookmarkElement);
-            mongoTemplate.update(Bookmark.class)
-                    .matching(Criteria.where("id").is(bookmark.getId()))
-                    .apply(new Update().push("bookmarks").value(bookmark))
-                    .first();
+
+            if(bookmark == null){
+
+                Website website;
+                if(!websiteRepository.findWebsiteByWebsiteLink(addNewBookmarkRequest.getBaseUrl()).isPresent()){
+                    website = new Website(addNewBookmarkRequest.getBaseUrl());
+                    mongoTemplate.update(Website.class)
+                            .matching(Criteria.where("id").is(website.getId()))
+                            .apply(new Update().push("websites").value(website))
+                            .first();
+                } else {
+                    website = websiteRepository.findWebsiteByWebsiteLink(addNewBookmarkRequest.getBaseUrl()).get();
+                }
+                Bookmark newBookmark = new Bookmark(website, addNewBookmarkRequest.getDateAdded());
+                newBookmark.getBookmarkElements().add(bookmarkElement);
+                mongoTemplate.update(Bookmark.class)
+                        .matching(Criteria.where("id").is(newBookmark.getId()))
+                        .apply(new Update().push("bookmarks").value(newBookmark))
+                        .first();
+                addNewBookmarkResponse.setStatus(1);
+            } else {
+                bookmark.getBookmarkElements().add(bookmarkElement);
+                mongoTemplate.update(Bookmark.class)
+                        .matching(Criteria.where("id").is(bookmark.getId()))
+                        .apply(new Update().push("bookmarks").value(bookmark))
+                        .first();
+                addNewBookmarkResponse.setStatus(1);
+            }
+            return addNewBookmarkResponse;
         }
-        return null;
+        catch (Exception e){
+
+            System.out.println("Exception in createBookmark in BookmarkService");
+            addNewBookmarkResponse.setStatus(-1);
+            return addNewBookmarkResponse;
+        }
     }
 
     public int addBookmarkToBookmarkFolder(ObjectId bookmarkId, ObjectId bookmarkFolderId){

@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "bookmarks")
@@ -27,5 +28,6 @@ public class Bookmark {
     public Bookmark(Website website, String date){
         this.websiteId = website;
         this.date = date;
+        bookmarkElements = new ArrayList<>();
     }
 }

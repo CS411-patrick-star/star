@@ -28,6 +28,12 @@ export default function BookmarkOptions() {
   const [showDeleteBookmarkForm, setShowDeleteBookmarkForm] = React.useState(false);
   const [showEditBookmarkForm, setShowEditBookmarkForm] = React.useState(false);
   
+  const [bookmarkName, setBookmarkName] = React.useState('');
+  const [bookmarkDescription, setBookmarkDescription] = React.useState('');
+  const [websiteUrl, setWebsiteUrl] = React.useState('');
+  const [bookmark, setSelectedBookmark] = React.useState(null);
+
+
   const handleClick = (path) => {
     if (path === '/add-bookmark') {
     
@@ -51,27 +57,21 @@ export default function BookmarkOptions() {
   };
 
   const handleEditBookmark = async () => {
-
-    // the logic to select a bookmark to edit will be implemented into the speed dial after bookmarks are being displayed
+    setSelectedBookmark(bookmark);
 
 
   }
   
   const handleAddBookmark = async () => {
-    const websiteId = "your-website-id";
-    const bookmarkName = "your-bookmark-name";
-    const bookmarkDescription = "your-bookmark-description";
-    const dateAdded = "your-date-added";
-    const addition = "your-addition";
-    const baseUrl = "your-base-url";
-
     const formData = new FormData();
-    formData.append("websiteId", websiteId);
+    formData.append("websiteId", "your-website-id");
     formData.append("bookmarkName", bookmarkName);
     formData.append("bookmarkDescription", bookmarkDescription);
-    formData.append("dateAdded", dateAdded);
-    formData.append("addition", addition);
-    formData.append("baseUrl", baseUrl);
+    formData.append("dateAdded", "your-date-added");
+    formData.append("addition", "your-addition");
+    formData.append("baseUrl", websiteUrl);
+
+
 
     try {
       const response = await fetch("http://localhost:8080/api/v1/bookmarks/newBookmark", {
@@ -112,9 +112,9 @@ export default function BookmarkOptions() {
         {showAddBookmarkForm && (
           <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
             <form>
-              <TextField label="Bookmark Name" fullWidth margin="normal" />
-              <TextField label="Bookmark Description" fullWidth margin="normal" />
-              <TextField label="Website URL" fullWidth margin="normal" />
+              <TextField label="Bookmark Name" fullWidth margin="normal" onChange={(e) => setBookmarkName(e.target.value)} />
+              <TextField label="Bookmark Description" fullWidth margin="normal" onChange={(e) => setBookmarkDescription(e.target.value)} />
+              <TextField label="Website URL" fullWidth margin="normal" onChange={(e) => setWebsiteUrl(e.target.value)} />
               <Button variant="contained" color="primary" onClick={handleAddBookmark}>
                 Add Bookmark
               </Button>
@@ -134,6 +134,6 @@ export default function BookmarkOptions() {
                     </form>
                   </Box>
                 )}
-              </Box>
+        </Box>
     );
   }

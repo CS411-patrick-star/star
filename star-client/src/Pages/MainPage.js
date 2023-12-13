@@ -12,8 +12,8 @@ const MainPage = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: '80vh',
-                    backgroundColor: 'azure'}} >
+                    height: '70vh',
+                    marginRight:'20vh'}} >
                 <BookmarkOptions  />
             </div>
         </div>

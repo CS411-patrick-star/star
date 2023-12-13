@@ -1,19 +1,13 @@
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import Fab from '@mui/material/Fab';
-import Grid from '@mui/material/Grid';
-
-import PrimarySearchAppBar from '../Components/PrimarySearchBar';
-import '../Styles/index.css';
-
-import CloseIcon from '@mui/icons-material/Close';
+import StarIcon from '@mui/icons-material/Star';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import BookmarkFolderContents from '../Components/BookmarkFolderContents';
+import PrimarySearchAppBar from '../Components/PrimarySearchBar';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -24,85 +18,112 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-function BookmarkFolderContents({ folderName, handleClose }) {
-    // Adjust the implementation as needed
-    const [open, setOpen] = React.useState(true);
+const BookmarksPage = () => {
+  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedBookmark, setSelectedBookmark] = useState(null);
+  const [allBookmarks, setAllBookmarks] = useState([]);
+
+  const goToBookmark = (folderId) => {
+    console.log(`Go to bookmark in ${folderId}!`);
+    setSelectedFolder(folderId);
+  };
+
+  const openBookmarkDialog = (bookmark) => {
+    setSelectedBookmark(bookmark);
+  };
+
+  const closeDialog = () => {
+    setSelectedFolder(null);
+    setSelectedBookmark(null);
+  };
+
+  const fetchAllBookmarks = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/bookmarks");
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const bookmarksData = await response.json();
+      setAllBookmarks(bookmarksData);
+    } catch (error) {
+      console.error('Error fetching bookmarks:', error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllBookmarks();
+  }, []);
+
+  // const folders = [
+  //   { id: '6575a0da537ab4ae239016fc', name: 'Folder 1' },
+  //   { id: 2, name: 'Folder 2' },
+  //   { id: 3, name: 'Folder 3' },
+  // ];
 
   return (
-    <React.Fragment>
-      <BootstrapDialog
-        onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
-        open={open}
-      >
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          bookmark folder name
-        </DialogTitle>
-        <IconButton aria-label="close" onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-        <DialogContent dividers>
-          <Typography gutterBottom>
-           all bookmarks in the folder will be shown here
-          </Typography>
-        
+    <div className="page">
+      <div className="b"></div>
+      <PrimarySearchAppBar />
+      <Grid container justifyContent="center" alignItems="center" style={{ height: '70vh' }}>
+{/*
+        {folders.map((folder) => (
+          <Fab
+            key={folder.id}
+            aria-label={`open ${folder.id}`}
+            onClick={() => goToBookmark(folder.id)}
+            style={{
+              width: '100px',
+              height: '100px',
+              margin: '0 10px',
+            }}
+          >
+            <FolderOpenIcon fontSize="large" />
+          </Fab>
+        ))}
+         */}
+      {selectedFolder ? (
+        <BookmarkFolderContents folderId={selectedFolder} handleClose={closeDialog} />
+      ) : (
+        <div className="displaybookmarks" style={{ display: 'flex', flexWrap: 'wrap' }}>
+          {allBookmarks.map((bookmark) => (
+            <div key={bookmark.id} style={{ margin: '10px' }}>
+              {/* Use IconButton to open dialog for each bookmark */}
+              <IconButton
+                onClick={() => openBookmarkDialog(bookmark)}
+                color="primary"
+                aria-label="open bookmark"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                
+               
+                }}
+              >
+                <StarIcon fontSize="large" />
+              </IconButton>
+              <hr />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Display bookmark details in a dialog */}
+      <BootstrapDialog onClose={closeDialog} open={selectedBookmark !== null}>
+        <DialogTitle>Bookmark Details</DialogTitle>
+        <DialogContent>
+          {selectedBookmark && (
+            <>
+              <p><strong>Sender:</strong> {selectedBookmark.sender}</p>
+              <p><strong>Title:</strong> {selectedBookmark.title}</p>
+              <p><strong>Content:</strong> {selectedBookmark.content}</p>
+              <p><strong>Date:</strong> {selectedBookmark.date}</p>
+            </>
+          )}
         </DialogContent>
       </BootstrapDialog>
-    </React.Fragment>
+      </Grid>
+    </div>
   );
-}
-const BookmarksPage = () => {
-    const [selectedFolder, setSelectedFolder] = useState(null);
-
-    const goToBookmark = (folderName) => {
-        console.log(`Go to bookmark in ${folderName}!`);
-        setSelectedFolder(folderName); // Set the selected folder name
-    
-    };
-
-    const closeDialog = () => {
-        setSelectedFolder(null); // Reset the selected folder name to close the dialog
-    };
-    const folders = [
-        { id: 1, name: 'Folder 1' },
-        { id: 2, name: 'Folder 2' },
-        { id: 3, name: 'Folder 3' },
-    ];
-    return (
-        <div className="page">
-            <div className="b"></div>
-            <PrimarySearchAppBar />
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '80vh' }}>
-                {folders.map((folder) => (
-                    <Fab
-                        key={folder.id}
-                        aria-label={`open ${folder.name}`}
-                        onClick={() => goToBookmark(folder.name)}
-                        style={{
-                            width: '100px',
-                            height: '100px',
-                            margin: '0 10px',
-                        }}
-                    >
-                        <FolderOpenIcon fontSize="large" />
-                    </Fab>
-                ))}
-            </Grid>
-            {/* Conditionally render BookmarkFolderContents based on the selected folder */}
-            {selectedFolder && (
-                <BookmarkFolderContents
-                    folderName={selectedFolder}
-                    handleClose={closeDialog}
-                />
-            )}
-        </div>
-    );
 };
 export default BookmarksPage;

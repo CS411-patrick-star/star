@@ -5,8 +5,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import axios from 'axios';
 import * as React from 'react';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -18,23 +18,60 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export default function BookmarkFolderContents() {
-  const [open, setOpen] = React.useState(false);
+const fetchBookmarksFromFolder = async (bookmarkFolderId) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/v1/bookmarks/bookmark_folder/${bookmarkFolderId}`);
+    const bookmarksInfo = response.data;
 
-  const handleClickOpen = () => {
-    setOpen(true);
+    const bookmarks = bookmarksInfo.map((bookmark) => {
+      const senderInfo = bookmark.sender.userAccount.firstName + " " + bookmark.sender.userAccount.lastName;
+      const titleInfo = bookmark.title;
+      const contentInfo = bookmark.content;
+      const dateInfo = bookmark.date;
+
+      return {
+        sender: senderInfo,
+        title: titleInfo,
+        content: contentInfo,
+        date: dateInfo,
+      };
+    });
+    console.log(bookmarks);
+    return bookmarks;
+  } catch (error) {
+    console.error('Error fetching bookmarks:', error.message);
+    throw error;
+  }
+};
+
+
+export default function BookmarkFolderContents({ folderId, handleClose }) {
+  const [open, setOpen] = React.useState(false);
+  const [bookmarks, setBookmarks] = React.useState([]);
+
+  const handleClickOpen = async () => {
+    try {
+      const fetchedBookmarks = await fetchBookmarksFromFolder(folderId);
+      setBookmarks(fetchedBookmarks);
+      setOpen(true);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
   };
-  const handleClose = () => {
+
+  const handleCloseDialog = () => {
     setOpen(false);
+    handleClose();
   };
+
+  React.useEffect(() => {
+    handleClickOpen(); // Automatically open the dialog when the component mounts
+  }, []); // Empty dependency array means it only runs once, like componentDidMount
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open dialog
-      </Button>
       <BootstrapDialog
-        onClose={handleClose}
+        onClose={handleCloseDialog}
         aria-labelledby="customized-dialog-title"
         open={open}
       >
@@ -43,7 +80,7 @@ export default function BookmarkFolderContents() {
         </DialogTitle>
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={handleCloseDialog}
           sx={{
             position: 'absolute',
             right: 8,
@@ -54,23 +91,18 @@ export default function BookmarkFolderContents() {
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <Typography gutterBottom>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-            consectetur ac, vestibulum at eros.
-          </Typography>
-          <Typography gutterBottom>
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
-            Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-          </Typography>
-          <Typography gutterBottom>
-            Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus
-            magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec
-            ullamcorper nulla non metus auctor fringilla.
-          </Typography>
+          {bookmarks.map((bookmark, index) => (
+            <div key={index}>
+              <p><strong>Sender:</strong> {bookmark.sender}</p>
+              <p><strong>Title:</strong> {bookmark.title}</p>
+              <p><strong>Content:</strong> {bookmark.content}</p>
+              <p><strong>Date:</strong> {bookmark.date}</p>
+              <hr />
+            </div>
+          ))}
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+          <Button autoFocus onClick={handleCloseDialog}>
             Save changes
           </Button>
         </DialogActions>

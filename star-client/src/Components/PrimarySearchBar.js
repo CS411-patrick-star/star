@@ -1,7 +1,8 @@
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import HomeIcon from '@mui/icons-material/Home';
-import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import SearchIcon from '@mui/icons-material/Search';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AppBar from '@mui/material/AppBar';
@@ -23,6 +24,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabComponent from './Tabs';
 
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -150,9 +152,19 @@ export default function PrimarySearchAppBar() {
     </Dialog>
   );
 
+  const refresh = () => {
+    window.location.reload();
+  }
+  const goBack = () => {
+    window.history.go(-1);
+  };
+  const goForward = () => {
+    window.history.go(1);
+  };
+
   const goToMainPage = () => {
     navigate('/');
-}
+  }
   const addPageToBookmarks = () => {
     ///////////////////////////
     console.log("added page");
@@ -225,10 +237,28 @@ export default function PrimarySearchAppBar() {
               edge="start"
               color="inherit"
               aria-label="open drawer"
+              onClick={goBack}
               sx={{ mr: 2 }} >
-              <MenuIcon />
+              <ArrowBackIosIcon />
             </IconButton>
-            
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={goForward}
+              sx={{ mr: 2 }} >
+              <ArrowForwardIosIcon />
+            </IconButton>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={refresh}
+              sx={{ mr: 2 }} >
+              <RotateLeftIcon />
+            </IconButton>
              <IconButton
               size="large"
               edge="start"
